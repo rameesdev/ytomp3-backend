@@ -113,6 +113,7 @@
   // Client conversion flow for search results
   async function startConversion(buttonEl) {
     const youtubeId = buttonEl.getAttribute('data-youtube-id');
+    const videoUrl = `https://www.youtube.com/watch?v=${youtubeId}`;
     const title = buttonEl.getAttribute('data-title');
     const artist = buttonEl.getAttribute('data-artist') || 'Unknown Artist';
     const duration = buttonEl.getAttribute('data-duration') || 0;
@@ -148,7 +149,7 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ 
-          url: youtubeId, 
+          url: videoUrl, 
           quality,
           title,
           artist,
