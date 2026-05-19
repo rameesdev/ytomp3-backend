@@ -90,6 +90,21 @@ exports.convert = async (req, res) => {
 
     // 1. Check if metadata is in DB
     let song = await Song.findOne({ youtubeId });
+    
+    // Check if we have a valid cached rawUrl
+    if (song && song.rawUrl && song.rawUrlExpiresAt && new Date() < song.rawUrlExpiresAt) {
+      return res.json({
+        status: 'completed',
+        progress: 100,
+        youtubeId,
+        slug: song.slug,
+        title: song.title,
+        artist: song.artist,
+        quality: targetQuality,
+        downloadUrl: `/download/${song._id}?quality=${targetQuality}`
+      });
+    }
+
     let metadata;
     
     if (!song) {
@@ -151,7 +166,12 @@ exports.convert = async (req, res) => {
       const lines = stdout.trim().split('\n');
       const rawUrl = lines[lines.length - 1].trim();
 
-      // Return the raw googlevideo.com link directly to the client!
+      // Cache raw URL in background (expires in 5.5 hours)
+      song.rawUrl = rawUrl;
+      song.rawUrlExpiresAt = new Date(Date.now() + 5.5 * 60 * 60 * 1000);
+      song.save().catch(err => console.error('[Cache] Failed to save rawUrl:', err.message));
+
+      // Return local proxy download URL
       return res.json({
         status: 'completed',
         progress: 100,
@@ -160,7 +180,7 @@ exports.convert = async (req, res) => {
         title,
         artist,
         quality: targetQuality,
-        downloadUrl: rawUrl 
+        downloadUrl: `/download/${song._id}?quality=${targetQuality}` 
       });
     });
 
@@ -258,30 +278,11 @@ exports.serveDownload = async (req, res) => {
       res.setHeader('Content-Type', 'audio/mp4');
       res.setHeader('Content-Disposition', `attachment; filename="YT_Audio.m4a"; filename*=UTF-8''${encodeURIComponent(downloadName)}`);
 
-      const { exec } = require('child_process');
       const https = require('https');
 
-      const videoUrl = `https://www.youtube.com/watch?v=${song.youtubeId}`;
-      
-      const ytDlpCmd = process.platform === 'win32' 
-        ? `"${require('path').resolve(__dirname, '../../yt-dlp.exe')}"` 
-        : `"${require('path').resolve(__dirname, '../../yt-dlp')}"`;
-      
-      // Force m4a extraction to avoid converting!
-      const command = `${ytDlpCmd} -f "bestaudio[ext=m4a]" --get-url "${videoUrl}"`;
-
-      exec(command, (error, stdout, stderr) => {
-        if (error) {
-          console.error('yt-dlp error:', error.message);
-          if (!res.headersSent) res.status(500).send('Failed to fetch audio stream URL.');
-          res.end();
-          return releaseLock();
-        }
-
-        const rawUrl = stdout.trim();
-
-        // Ultra-lightweight network proxy (0% CPU usage)
-        https.get(rawUrl, (proxyRes) => {
+      // Helper function to stream a URL to the client
+      const startStreaming = (urlToStream) => {
+        https.get(urlToStream, (proxyRes) => {
           // If YouTube returns an error, abort
           if (proxyRes.statusCode !== 200) {
             if (!res.headersSent) res.status(500).send('Failed to stream audio from YouTube.');
@@ -308,6 +309,44 @@ exports.serveDownload = async (req, res) => {
           res.end();
           releaseLock();
         });
+      };
+
+      // Check if we have a valid, cached rawUrl
+      if (song.rawUrl && song.rawUrlExpiresAt && new Date() < song.rawUrlExpiresAt) {
+        console.log(`[Cache Hit] Streaming rawUrl directly for: ${song.title}`);
+        return startStreaming(song.rawUrl);
+      }
+
+      // Cache miss - run yt-dlp to get a fresh raw URL
+      console.log(`[Cache Miss] Running yt-dlp to get fresh rawUrl for: ${song.title}`);
+      const { exec } = require('child_process');
+      const { getCookiesArgs } = require('../utils/cookies');
+      const cookiesArg = getCookiesArgs();
+
+      const videoUrl = `https://www.youtube.com/watch?v=${song.youtubeId}`;
+      const ytDlpCmd = process.platform === 'win32' 
+        ? `"${require('path').resolve(__dirname, '../../yt-dlp.exe')}"` 
+        : `"${require('path').resolve(__dirname, '../../yt-dlp')}"`;
+      
+      const command = `${ytDlpCmd} --no-warnings ${cookiesArg} --js-runtimes node -f "bestaudio[ext=m4a]/bestaudio" --get-url "${videoUrl}"`;
+
+      exec(command, (error, stdout, stderr) => {
+        if (error) {
+          console.error('yt-dlp error:', error.message);
+          if (!res.headersSent) res.status(500).send('Failed to fetch audio stream URL.');
+          res.end();
+          return releaseLock();
+        }
+
+        const lines = stdout.trim().split('\n');
+        const freshUrl = lines[lines.length - 1].trim();
+
+        // Update database cache
+        song.rawUrl = freshUrl;
+        song.rawUrlExpiresAt = new Date(Date.now() + 5.5 * 60 * 60 * 1000);
+        song.save().catch(err => console.error('[Cache] Failed to update rawUrl:', err.message));
+
+        startStreaming(freshUrl);
       });
     }));
 

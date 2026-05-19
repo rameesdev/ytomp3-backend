@@ -8,6 +8,8 @@ const SongSchema = new mongoose.Schema({
   duration: { type: Number, default: 0 }, // in seconds
   thumbnail: { type: String },
   youtubeId: { type: String, required: true, unique: true, index: true },
+  rawUrl: { type: String },
+  rawUrlExpiresAt: { type: Date },
   tags: [{ type: String }],
   views: { type: Number, default: 0, index: true },
   downloadsCount: { type: Number, default: 0, index: true },
