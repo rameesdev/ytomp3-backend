@@ -130,13 +130,16 @@ exports.convert = async (req, res) => {
 
     // Run yt-dlp to get the raw Google Video URL directly
     const { exec } = require('child_process');
+    const { getCookiesArgs } = require('../utils/cookies');
+    const cookiesArg = getCookiesArgs();
+
     const videoUrl = `https://www.youtube.com/watch?v=${song.youtubeId}`;
     const ytDlpCmd = process.platform === 'win32' 
       ? `"${require('path').resolve(__dirname, '../../yt-dlp.exe')}"` 
       : `"${require('path').resolve(__dirname, '../../yt-dlp')}"`;
     
     // Request raw URL, --no-warnings ensures we only get the URL in stdout
-    const command = `${ytDlpCmd} --no-warnings -f "bestaudio[ext=m4a]/bestaudio" --get-url "${videoUrl}"`;
+    const command = `${ytDlpCmd} --no-warnings ${cookiesArg} -f "bestaudio[ext=m4a]/bestaudio" --get-url "${videoUrl}"`;
 
     exec(command, (error, stdout, stderr) => {
       if (error) {

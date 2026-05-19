@@ -31,6 +31,10 @@ function escapeXml(unsafe) {
  * Generate all sitemaps
  */
 async function generateSitemaps(domain = 'https://ytomp3.cc') {
+  if (process.env.VERCEL) {
+    console.log('[Sitemap Generator] Running on Vercel (Read-Only FS). Skipping static sitemap file generation.');
+    return;
+  }
   console.log('[Sitemap Generator] Starting sitemap generation...');
   const cleanDomain = domain.endsWith('/') ? domain.slice(0, -1) : domain;
   const now = new Date().toISOString().split('T')[0];
