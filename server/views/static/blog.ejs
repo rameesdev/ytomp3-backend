@@ -1,0 +1,23 @@
+<%- include('../partials/header') %>
+
+<section class="hero" style="padding: 50px 0 30px; text-align: left;">
+  <h1 style="font-size: 38px;">YTMP3 <span>Blog & Guides</span></h1>
+  <p>Learn tips, tricks, and tutorials on converting YouTube videos to MP3 on all your devices. Compare bitrates and discover offline music methods.</p>
+</section>
+
+<section style="margin-bottom: 60px;">
+  <div style="display: flex; flex-direction: column; gap: 30px; max-width: 800px;">
+    <% articles.forEach(article => { %>
+      <div style="background: var(--bg-secondary); border: 1px solid var(--border-color); border-radius: var(--border-radius-lg); padding: 25px; transition: var(--transition-smooth);">
+        <div style="font-size: 13px; color: var(--text-muted); margin-bottom: 10px;"><%= article.date %></div>
+        <h2 style="font-size: 22px; font-weight: 700; margin-bottom: 10px; color: #fff;">
+          <a href="/blog/<%= article.slug %>" style="color: #fff; text-decoration: none;"><%= article.title %></a>
+        </h2>
+        <p style="color: var(--text-secondary); margin-bottom: 15px;"><%= article.summary %></p>
+        <a href="/blog/<%= article.slug %>" class="btn-convert" style="display: inline-block; padding: 8px 16px; font-size: 14px;">Read Article &rsaquo;</a>
+      </div>
+    <% }) %>
+  </div>
+</section>
+
+<%- include('../partials/footer') %>

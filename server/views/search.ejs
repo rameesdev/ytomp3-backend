@@ -1,0 +1,213 @@
+<%- include('partials/header') %>
+
+<!-- Search Header Section -->
+<section class="hero" style="padding: 50px 0 30px;">
+  <h1 style="font-size: 36px;">Convert <span>"<%= query %>"</span> YouTube to MP3</h1>
+  <p>Find matches and convert "<%= query %>" videos to MP3 audio files instantly. Select your preferred track from the search results below.</p>
+  
+  <!-- Progress / Status Card in Search (Shared utility) -->
+  <div class="converter-box" style="margin-bottom: 20px; display: none;" id="search-converter-box">
+    <div class="status-container" id="status-card" style="display: block;">
+      <div style="margin-bottom: 10px; font-weight: 700;" id="status-song-title">Song Title</div>
+      <div class="status-details">
+        <span class="status-phase" id="status-phase">Preparing...</span>
+        <span id="status-percent">0%</span>
+      </div>
+      <div class="progress-bar-outer">
+        <div class="progress-bar-inner" id="status-progress"></div>
+      </div>
+      <div id="status-download-btn-wrap" style="display: none;">
+        <a href="" id="status-download-link" class="btn-download-trigger" download>
+          Download MP3 File
+        </a>
+      </div>
+      <div id="status-error-wrap" class="badge badge-danger" style="display: none; padding: 10px; width: 100%; text-align: center; margin-top: 10px;">
+        Error occurred. Please try again.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Search Results Grid -->
+<section style="margin-bottom: 50px;">
+  <h2 class="section-title">YouTube Search Results for "<%= query %>"</h2>
+  
+  <% if (results && results.length > 0) { %>
+    <div class="search-results-list">
+      <% results.forEach(video => { %>
+        <div class="search-item" id="video-<%= video.youtubeId %>">
+          <div class="search-item-thumb">
+            <img src="<%= video.thumbnail %>" alt="<%= video.title %> Thumbnail" loading="lazy">
+          </div>
+          <div class="search-item-details">
+            <div class="search-item-title" title="<%= video.title %>"><%= video.title %></div>
+            <div class="search-item-meta">
+              <span><strong>Channel:</strong> <%= video.artist %></span>
+              <span><strong>Duration:</strong> <%= Math.floor(video.duration / 60) %>:<%= String(video.duration % 60).padStart(2, '0') %> mins</span>
+            </div>
+            
+            <div style="display: flex; gap: 10px; align-items: center; margin-top: 10px;">
+              <select id="quality-<%= video.youtubeId %>" class="tile-content" style="padding: 6px 12px; outline: none; background: rgba(0,0,0,0.3); border-color: var(--border-color); color: #fff; font-weight: 500; font-family: var(--font-sans);">
+                <option value="320kbps">320kbps (Best Quality)</option>
+                <option value="128kbps" selected>128kbps (Standard Quality)</option>
+                <option value="64kbps">64kbps (Small Size)</option>
+              </select>
+              
+              <button class="search-item-btn" data-youtube-id="<%= video.youtubeId %>" data-title="<%= video.title %>" onclick="startConversion(this)">
+                Convert to MP3
+              </button>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } else { %>
+    <div style="text-align: center; padding: 40px; border: 1px dashed var(--border-color); border-radius: var(--border-radius-md);">
+      <p style="color: var(--text-secondary);">No active YouTube search results found for "<%= query %>". Please check spelling or try a different term.</p>
+      <a href="/" class="btn-convert" style="display: inline-block; margin-top: 15px; padding: 10px 20px;">Go to Homepage</a>
+    </div>
+  <% } %>
+</section>
+
+<!-- Programmatic SEO Text Section -->
+<% if (seoParagraph) { %>
+  <section class="seo-section">
+    <div class="seo-rich-block">
+      <h2>Convert <%= query.replace(/\b\w/g, c => c.toUpperCase()) %> to MP3 Online</h2>
+      <%- seoParagraph.replace(/\n\n/g, '</p><p>').replace(/^/, '<p>').replace(/$/, '</p>') %>
+    </div>
+  </section>
+<% } %>
+
+<!-- FAQ Accordion List -->
+<% if (faqs && faqs.length > 0) { %>
+  <section class="faq-section">
+    <div class="faq-wrapper">
+      <h2 class="section-title" style="margin-bottom: 30px;">Frequently Asked Questions</h2>
+      
+      <% faqs.forEach(faq => { %>
+        <div class="faq-item">
+          <div class="faq-question"><%= faq.question %></div>
+          <div class="faq-answer"><%= faq.answer %></div>
+        </div>
+      <% }) %>
+    </div>
+  </section>
+<% } %>
+
+<script>
+  // FAQ Accordion logic
+  document.querySelectorAll('.faq-question').forEach(item => {
+    item.addEventListener('click', event => {
+      const parent = item.parentElement;
+      parent.classList.toggle('active');
+    });
+  });
+
+  // Client conversion flow for search results
+  async function startConversion(buttonEl) {
+    const youtubeId = buttonEl.getAttribute('data-youtube-id');
+    const title = buttonEl.getAttribute('data-title');
+    const qualitySelect = document.getElementById(`quality-${youtubeId}`);
+    const quality = qualitySelect ? qualitySelect.value : '128kbps';
+    
+    // Smooth scroll to top where converter status box is located
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+
+    // Show conversion status box
+    const converterBox = document.getElementById('search-converter-box');
+    converterBox.style.display = 'block';
+
+    const songTitleEl = document.getElementById('status-song-title');
+    songTitleEl.innerText = title;
+
+    const phaseEl = document.getElementById('status-phase');
+    const percentEl = document.getElementById('status-percent');
+    const progressEl = document.getElementById('status-progress');
+    const downloadWrap = document.getElementById('status-download-btn-wrap');
+    const errorWrap = document.getElementById('status-error-wrap');
+
+    // Reset UI
+    phaseEl.innerText = 'Initializing...';
+    percentEl.innerText = '0%';
+    progressEl.style.width = '0%';
+    downloadWrap.style.display = 'none';
+    errorWrap.style.display = 'none';
+
+    try {
+      const response = await fetch('/api/convert', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: youtubeId, quality })
+      });
+
+      const data = await response.json();
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      if (data.status === 'completed') {
+        phaseEl.innerText = 'Completed!';
+        percentEl.innerText = '100%';
+        progressEl.style.width = '100%';
+        downloadWrap.style.display = 'block';
+        document.getElementById('status-download-link').href = data.downloadUrl;
+        return;
+      }
+
+      // Track status
+      const jobId = data.jobId;
+      trackStatus(jobId);
+
+    } catch (err) {
+      console.error(err);
+      phaseEl.innerText = 'Failed';
+      errorWrap.style.display = 'block';
+      errorWrap.innerText = err.message || 'An error occurred during initiation.';
+    }
+  }
+
+  function trackStatus(jobId) {
+    const phaseEl = document.getElementById('status-phase');
+    const percentEl = document.getElementById('status-percent');
+    const progressEl = document.getElementById('status-progress');
+    const downloadWrap = document.getElementById('status-download-btn-wrap');
+    const errorWrap = document.getElementById('status-error-wrap');
+
+    const interval = setInterval(async () => {
+      try {
+        const response = await fetch(`/api/status/${jobId}`);
+        const data = await response.json();
+
+        if (data.error) {
+          clearInterval(interval);
+          phaseEl.innerText = 'Failed';
+          errorWrap.style.display = 'block';
+          errorWrap.innerText = data.error;
+          return;
+        }
+
+        const progress = data.progress || 0;
+        percentEl.innerText = `${progress}%`;
+        progressEl.style.width = `${progress}%`;
+        phaseEl.innerText = data.phase === 'downloading' ? 'Downloading audio from YouTube...' : 'Converting to MP3 format...';
+
+        if (data.status === 'completed') {
+          clearInterval(interval);
+          phaseEl.innerText = 'Completed!';
+          percentEl.innerText = '100%';
+          progressEl.style.width = '100%';
+          downloadWrap.style.display = 'block';
+          document.getElementById('status-download-link').href = data.downloadUrl;
+        }
+      } catch (err) {
+        clearInterval(interval);
+        phaseEl.innerText = 'Failed';
+        errorWrap.style.display = 'block';
+        errorWrap.innerText = 'Lost connection to conversion worker.';
+      }
+    }, 2000);
+  }
+</script>
+
+<%- include('partials/footer') %>

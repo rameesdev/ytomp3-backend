@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="robots" content="<%= seo.robots %>">
+  
+  <title><%= seo.title %></title>
+  <meta name="description" content="<%= seo.description %>">
+  <meta name="keywords" content="<%= seo.keywords %>">
+  <link rel="canonical" href="<%= seo.canonical || '' %>">
+
+  <!-- OpenGraph Metadata -->
+  <meta property="og:site_name" content="<%= seo.siteName %>">
+  <meta property="og:title" content="<%= seo.title %>">
+  <meta property="og:description" content="<%= seo.description %>">
+  <meta property="og:url" content="<%= seo.canonical || '' %>">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="<%= seo.image %>">
+
+  <!-- Twitter Card Metadata -->
+  <meta name="twitter:card" content="<%= seo.twitterCard %>">
+  <meta name="twitter:title" content="<%= seo.title %>">
+  <meta name="twitter:description" content="<%= seo.description %>">
+  <meta name="twitter:image" content="<%= seo.image %>">
+
+  <!-- CSS Stylesheets -->
+  <link rel="stylesheet" href="/css/style.css">
+
+  <!-- Dynamic JSON-LD Structured Data Schema -->
+  <% if (seo.jsonLd) { %>
+    <script type="application/ld+json">
+      <%- JSON.stringify(seo.jsonLd) %>
+    </script>
+  <% } %>
+
+  <!-- Breadcrumb Structured Data Schema -->
+  <% if (seo.breadcrumbJsonLd) { %>
+    <script type="application/ld+json">
+      <%- JSON.stringify(seo.breadcrumbJsonLd) %>
+    </script>
+  <% } %>
+</head>
+<body>
+
+  <!-- Top Navigation Bar -->
+  <header>
+    <div class="container header-inner">
+      <a href="/" class="logo">
+        YT<span>MP3</span>
+      </a>
+      
+      <nav>
+        <ul class="nav-links">
+          <li><a href="/" class="<%= (seo.canonical || '').endsWith('/') ? 'active' : '' %>">Home</a></li>
+          <li><a href="/trending" class="<%= (seo.canonical || '').includes('/trending') ? 'active' : '' %>">Trending</a></li>
+          <li><a href="/top-downloads" class="<%= (seo.canonical || '').includes('/top-downloads') ? 'active' : '' %>">Top Downloads</a></li>
+          <li><a href="/blog" class="<%= (seo.canonical || '').includes('/blog') ? 'active' : '' %>">Blog</a></li>
+          <li><a href="/faq" class="<%= (seo.canonical || '').includes('/faq') ? 'active' : '' %>">FAQ</a></li>
+          <li><a href="/admin" class="btn-admin">Admin Portal</a></li>
+        </ul>
+      </nav>
+    </div>
+  </header>
+
+  <!-- Sticky Top Ad Slot to Maintain Core Web Vitals (Prevent CLS) -->
+  <div class="container">
+    <div class="ad-slot">
+      <span>Advertisement Space - Sticky Header Banner (728x90)</span>
+    </div>
+  </div>
+
+  <!-- Breadcrumb Navigation trail if set -->
+  <% if (seo.breadcrumbs && seo.breadcrumbs.length > 0) { %>
+    <div class="container">
+      <div class="breadcrumbs">
+        <% seo.breadcrumbs.forEach((crumb, idx) => { %>
+          <% if (idx > 0) { %>
+            <span>&rsaquo;</span>
+          <% } %>
+          <% if (idx === seo.breadcrumbs.length - 1) { %>
+            <%= crumb.name %>
+          <% } else { %>
+            <a href="<%= crumb.url %>"><%= crumb.name %></a>
+          <% } %>
+        <% }) %>
+      </div>
+    </div>
+  <% } %>
+
+  <main class="container">

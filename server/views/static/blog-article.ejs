@@ -1,0 +1,21 @@
+<%- include('../partials/header') %>
+
+<article style="max-width: 800px; margin: 40px auto 60px;">
+  
+  <header style="border-bottom: 1px solid var(--border-color); padding-bottom: 20px; margin-bottom: 30px; background: transparent; backdrop-filter: none; position: static;">
+    <div style="font-size: 14px; color: var(--text-muted); margin-bottom: 10px;">Published on <%= article.date %> by YTMP3 Editors</div>
+    <h1 style="font-size: 36px; font-weight: 800; line-height: 1.2; color: #fff; background: none; -webkit-text-fill-color: initial;"><%= article.title %></h1>
+  </header>
+
+  <section class="seo-rich-block" style="padding: 0;">
+    <%- article.content %>
+  </section>
+
+  <div style="margin-top: 50px; padding-top: 30px; border-top: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center;">
+    <a href="/blog" style="color: var(--accent-primary); font-weight: 600;">&lsaquo; Back to Blog Index</a>
+    <a href="/" class="btn-convert" style="padding: 8px 16px; font-size: 14px;">Go to Converter</a>
+  </div>
+
+</article>
+
+<%- include('../partials/footer') %>

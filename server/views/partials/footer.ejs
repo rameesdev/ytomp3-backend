@@ -1,0 +1,96 @@
+  </main> <!-- Close Main Container -->
+
+  <!-- In-content Ad Slot before footer -->
+  <div class="container">
+    <div class="ad-slot">
+      <span>Advertisement Space - Mid Page Banner (728x90)</span>
+    </div>
+  </div>
+
+  <!-- Footer section -->
+  <footer>
+    <div class="container">
+      
+      <!-- Programmatic Auto Internal Links Engine Container -->
+      <div class="footer-links-engine">
+        
+        <% if (internalLinks.recentSongs && internalLinks.recentSongs.length > 0) { %>
+          <div class="link-cloud-title">Recently Converted Songs</div>
+          <div class="link-cloud">
+            <% internalLinks.recentSongs.forEach(song => { %>
+              <a href="/song/<%= song.slug %>" class="link-tag"><%= song.title %></a>
+            <% }) %>
+          </div>
+        <% } %>
+
+        <% if (internalLinks.trendingSearches && internalLinks.trendingSearches.length > 0) { %>
+          <div class="link-cloud-title">Trending Search Keywords</div>
+          <div class="link-cloud">
+            <% internalLinks.trendingSearches.forEach(search => { %>
+              <a href="/search/<%= search.slug %>" class="link-tag"><%= search.keyword %></a>
+            <% }) %>
+          </div>
+        <% } %>
+
+        <% if (internalLinks.popularArtists && internalLinks.popularArtists.length > 0) { %>
+          <div class="link-cloud-title">Popular Artists</div>
+          <div class="link-cloud">
+            <% internalLinks.popularArtists.forEach(artist => { %>
+              <a href="/artist/<%= artist.slug %>" class="link-tag"><%= artist.name %></a>
+            <% }) %>
+          </div>
+        <% } %>
+
+        <div class="link-cloud-title font-bold text-white mb-2">Music Genres</div>
+        <div class="link-cloud">
+          <% internalLinks.genres.forEach(genre => { %>
+            <a href="/genre/<%= genre.slug %>" class="link-tag"><%= genre.name %></a>
+          <% }) %>
+        </div>
+      </div>
+
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <h3>YTMP3 Converter</h3>
+          <p>YTMP3 is the ultimate free online tool for downloading high-quality MP3 tracks converted from YouTube. Highly optimized for speed, reliability, and security, YTMP3 offers unlimited conversions in 64kbps, 128kbps, and 320kbps format.</p>
+          <p>&copy; <%= new Date().getFullYear() %> YTMP3.cc. All Rights Reserved.</p>
+        </div>
+
+        <div class="footer-links">
+          <h4>Converter Tools</h4>
+          <ul>
+            <li><a href="/">YouTube to MP3</a></li>
+            <li><a href="/trending">Trending Music</a></li>
+            <li><a href="/top-downloads">Top Downloads</a></li>
+            <li><a href="/faq">FAQ & Guidelines</a></li>
+            <li><a href="/blog">Blog Articles</a></li>
+          </ul>
+        </div>
+
+        <div class="footer-links">
+          <h4>Legal & Safety</h4>
+          <ul>
+            <li><a href="/dmca">DMCA Copyright Policy</a></li>
+            <li><a href="/privacy-policy">Privacy Policy</a></li>
+            <li><a href="/terms-of-service">Terms of Service</a></li>
+            <li><a href="/contact">Contact Support</a></li>
+          </ul>
+        </div>
+      </div>
+
+      <div class="footer-bottom">
+        <p>Disclaimer: YTMP3 does not host or distribute copyrighted media. Users are responsible for complying with YouTube's Terms of Service and local copyright laws.</p>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- Sticky Footer Ad Slot (lucrative, bottom fixed) -->
+  <div class="ad-slot sticky-footer">
+    <span>Sticky Anchor Ad Slot - Mobile & Desktop Overlay (728x90 / 320x50)</span>
+  </div>
+
+  <!-- Client-side Scripts -->
+  <script src="/js/main.js"></script>
+</body>
+</html>

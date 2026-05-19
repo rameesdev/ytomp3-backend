@@ -1,0 +1,8 @@
+node_modules/
+.env
+scratch/
+temp/
+uploads/
+test.js
+.vercel/
+yt-dlp.exe

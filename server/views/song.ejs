@@ -1,0 +1,233 @@
+<%- include('partials/header') %>
+
+<div class="song-layout">
+  
+  <!-- Left Side: Song Details & Conversion card -->
+  <div>
+    <div class="song-main-details">
+      <div class="song-detail-thumb">
+        <img src="<%= song.thumbnail %>" alt="<%= song.title %> Thumbnail" loading="lazy">
+      </div>
+      <div class="song-info-meta">
+        <h1><%= song.title %></h1>
+        <a href="/artist/<%= song.artistSlug %>" class="artist-link"><%= song.artist %></a>
+        <div class="meta-row">
+          <span><strong>Source:</strong> YouTube Audio</span>
+          <span><strong>Duration:</strong> <%= Math.floor(song.duration / 60) %>:<%= String(song.duration % 60).padStart(2, '0') %> mins</span>
+          <span><strong>Downloads:</strong> <%= song.downloadsCount || 0 %></span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quality Selection & Convert Form Card -->
+    <div class="converter-box" style="margin: 0 0 40px 0; max-width: 100%;">
+      <h3 style="margin-bottom: 15px; font-size: 18px; font-weight: 700;">Convert this song to MP3</h3>
+      
+      <div class="options-group" style="justify-content: flex-start; margin-bottom: 20px;">
+        <span class="options-label">Select Bitrate:</span>
+        <div class="radio-tiles">
+          <label class="radio-tile-label">
+            <input type="radio" name="song-quality" value="320kbps" checked>
+            <div class="tile-content">320 kbps (High Quality)</div>
+          </label>
+          <label class="radio-tile-label">
+            <input type="radio" name="song-quality" value="128kbps">
+            <div class="tile-content">128 kbps (Standard)</div>
+          </label>
+          <label class="radio-tile-label">
+            <input type="radio" name="song-quality" value="64kbps">
+            <div class="tile-content">64 kbps (Small Size)</div>
+          </label>
+        </div>
+      </div>
+
+      <button class="btn-convert" onclick="triggerSongConversion()" style="width: 100%;">
+        Start MP3 Conversion
+      </button>
+
+      <!-- Progress status container -->
+      <div class="status-container" id="song-status-card" style="margin-top: 20px;">
+        <div class="status-details">
+          <span class="status-phase" id="status-phase">Preparing...</span>
+          <span id="status-percent">0%</span>
+        </div>
+        <div class="progress-bar-outer">
+          <div class="progress-bar-inner" id="status-progress"></div>
+        </div>
+        <div id="status-download-btn-wrap" style="display: none;">
+          <a href="" id="status-download-link" class="btn-download-trigger" download>
+            Download Converted MP3
+          </a>
+        </div>
+        <div id="status-error-wrap" class="badge badge-danger" style="display: none; padding: 10px; width: 100%; text-align: center; margin-top: 10px;">
+          Failed. Please try converting again.
+        </div>
+      </div>
+    </div>
+
+    <!-- Related Songs Section -->
+    <% if (relatedSongs && relatedSongs.length > 0) { %>
+      <section style="margin-bottom: 40px;">
+        <h2 class="section-title">Related Music Track Recommendations</h2>
+        <div class="music-grid">
+          <% relatedSongs.forEach(item => { %>
+            <div class="music-card">
+              <div class="card-img-wrap">
+                <img src="<%= item.thumbnail %>" alt="<%= item.title %> MP3" loading="lazy">
+              </div>
+              <div class="card-title" title="<%= item.title %>"><%= item.title %></div>
+              <div class="card-artist" title="<%= item.artist %>"><%= item.artist %></div>
+              <a href="/song/<%= item.slug %>" class="card-btn">Convert track</a>
+            </div>
+          <% }) %>
+        </div>
+      </section>
+    <% } %>
+  </div>
+
+  <!-- Right Side: Sidebar Ad Slots & Details -->
+  <div>
+    <div class="ad-slot sidebar">
+      <span>Sidebar Banner Ad Space (300x250)</span>
+    </div>
+    
+    <div class="ad-slot sidebar" style="margin-top: 20px;">
+      <span>Alternative Banner Ad Space (300x600)</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- Programmatic SEO Text Section -->
+<% if (seoContent) { %>
+  <section class="seo-section">
+    <div class="seo-rich-block">
+      <h2>About <%= song.title %> MP3 Converter</h2>
+      <%- seoContent.replace(/\n\n/g, '</p><p>').replace(/^/, '<p>').replace(/$/, '</p>') %>
+    </div>
+  </section>
+<% } %>
+
+<!-- FAQ Section -->
+<% if (faqs && faqs.length > 0) { %>
+  <section class="faq-section" style="margin: 0 -20px; padding: 60px 20px;">
+    <div class="faq-wrapper">
+      <h2 class="section-title" style="margin-bottom: 30px;">Frequently Asked Questions</h2>
+      
+      <% faqs.forEach(faq => { %>
+        <div class="faq-item">
+          <div class="faq-question"><%= faq.question %></div>
+          <div class="faq-answer"><%= faq.answer %></div>
+        </div>
+      <% }) %>
+    </div>
+  </section>
+<% } %>
+
+<script>
+  // FAQ Accordion logic
+  document.querySelectorAll('.faq-question').forEach(item => {
+    item.addEventListener('click', event => {
+      const parent = item.parentElement;
+      parent.classList.toggle('active');
+    });
+  });
+
+  async function triggerSongConversion() {
+    const youtubeId = '<%= song.youtubeId %>';
+    const qualityRadio = document.querySelector('input[name="song-quality"]:checked');
+    const quality = qualityRadio ? qualityRadio.value : '128kbps';
+
+    const statusCard = document.getElementById('song-status-card');
+    statusCard.style.display = 'block';
+
+    const phaseEl = document.getElementById('status-phase');
+    const percentEl = document.getElementById('status-percent');
+    const progressEl = document.getElementById('status-progress');
+    const downloadWrap = document.getElementById('status-download-btn-wrap');
+    const errorWrap = document.getElementById('status-error-wrap');
+
+    // Reset UI
+    phaseEl.innerText = 'Initializing...';
+    percentEl.innerText = '0%';
+    progressEl.style.width = '0%';
+    downloadWrap.style.display = 'none';
+    errorWrap.style.display = 'none';
+
+    try {
+      const response = await fetch('/api/convert', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ url: youtubeId, quality })
+      });
+
+      const data = await response.json();
+      if (data.error) {
+        throw new Error(data.error);
+      }
+
+      if (data.status === 'completed') {
+        phaseEl.innerText = 'Completed!';
+        percentEl.innerText = '100%';
+        progressEl.style.width = '100%';
+        downloadWrap.style.display = 'block';
+        document.getElementById('status-download-link').href = data.downloadUrl;
+        return;
+      }
+
+      // Track status
+      const jobId = data.jobId;
+      trackStatus(jobId);
+
+    } catch (err) {
+      console.error(err);
+      phaseEl.innerText = 'Failed';
+      errorWrap.style.display = 'block';
+      errorWrap.innerText = err.message || 'An error occurred during initiation.';
+    }
+  }
+
+  function trackStatus(jobId) {
+    const phaseEl = document.getElementById('status-phase');
+    const percentEl = document.getElementById('status-percent');
+    const progressEl = document.getElementById('status-progress');
+    const downloadWrap = document.getElementById('status-download-btn-wrap');
+    const errorWrap = document.getElementById('status-error-wrap');
+
+    const interval = setInterval(async () => {
+      try {
+        const response = await fetch(`/api/status/${jobId}`);
+        const data = await response.json();
+
+        if (data.error) {
+          clearInterval(interval);
+          phaseEl.innerText = 'Failed';
+          errorWrap.style.display = 'block';
+          errorWrap.innerText = data.error;
+          return;
+        }
+
+        const progress = data.progress || 0;
+        percentEl.innerText = `${progress}%`;
+        progressEl.style.width = `${progress}%`;
+        phaseEl.innerText = data.phase === 'downloading' ? 'Downloading from YouTube...' : 'Transcoding to MP3 audio...';
+
+        if (data.status === 'completed') {
+          clearInterval(interval);
+          phaseEl.innerText = 'Completed!';
+          percentEl.innerText = '100%';
+          progressEl.style.width = '100%';
+          downloadWrap.style.display = 'block';
+          document.getElementById('status-download-link').href = data.downloadUrl;
+        }
+      } catch (err) {
+        clearInterval(interval);
+        phaseEl.innerText = 'Failed';
+        errorWrap.style.display = 'block';
+        errorWrap.innerText = 'Connection lost with the server.';
+      }
+    }, 2000);
+  }
+</script>
+
+<%- include('partials/footer') %>

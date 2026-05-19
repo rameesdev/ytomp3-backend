@@ -1,0 +1,32 @@
+<%- include('../partials/header') %>
+
+<section style="max-width: 800px; margin: 40px auto 60px;">
+  <h1 style="font-size: 32px; font-weight: 800; margin-bottom: 25px;">Contact Support</h1>
+  
+  <div class="seo-rich-block" style="padding: 0; margin-bottom: 30px;">
+    <p>Have questions, suggestions, or found a bug? We want to hear from you. Please fill out the form below, and our support team will get back to you within 48 hours.</p>
+  </div>
+
+  <div class="converter-box" style="margin: 0; max-width: 100%;">
+    <form onsubmit="alert('Message sent successfully! We will get back to you shortly.'); event.preventDefault();">
+      <div style="margin-bottom: 15px;">
+        <label style="display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; color: var(--text-secondary);">Your Name</label>
+        <input type="text" class="tile-content" style="width: 100%; border-radius: var(--border-radius-md); padding: 12px; outline: none; background: rgba(0,0,0,0.3); border-color: var(--border-color); color: #fff;" placeholder="Enter name" required>
+      </div>
+
+      <div style="margin-bottom: 15px;">
+        <label style="display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; color: var(--text-secondary);">Your Email</label>
+        <input type="email" class="tile-content" style="width: 100%; border-radius: var(--border-radius-md); padding: 12px; outline: none; background: rgba(0,0,0,0.3); border-color: var(--border-color); color: #fff;" placeholder="Enter email" required>
+      </div>
+
+      <div style="margin-bottom: 20px;">
+        <label style="display: block; font-size: 14px; font-weight: 600; margin-bottom: 6px; color: var(--text-secondary);">Your Message</label>
+        <textarea class="tile-content" rows="6" style="width: 100%; border-radius: var(--border-radius-md); padding: 12px; outline: none; background: rgba(0,0,0,0.3); border-color: var(--border-color); color: #fff; font-family: var(--font-sans); resize: none;" placeholder="Type message details here..." required></textarea>
+      </div>
+
+      <button type="submit" class="btn-convert" style="width: 100%;">Send Message</button>
+    </form>
+  </div>
+</section>
+
+<%- include('../partials/footer') %>

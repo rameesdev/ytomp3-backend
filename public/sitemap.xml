@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <sitemap>
+    <loc>http://localhost:3000/sitemaps/sitemap-main.xml</loc>
+    <lastmod>2026-05-19</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>http://localhost:3000/sitemaps/sitemap-songs.xml</loc>
+    <lastmod>2026-05-19</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>http://localhost:3000/sitemaps/sitemap-artists.xml</loc>
+    <lastmod>2026-05-19</lastmod>
+  </sitemap>
+  <sitemap>
+    <loc>http://localhost:3000/sitemaps/sitemap-searches.xml</loc>
+    <lastmod>2026-05-19</lastmod>
+  </sitemap>
+</sitemapindex>

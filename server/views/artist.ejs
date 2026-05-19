@@ -1,0 +1,62 @@
+<%- include('partials/header') %>
+
+<!-- Artist Profile Banner -->
+<section class="artist-hero">
+  <div class="artist-avatar">
+    <img src="<%= artist.image || '/images/default-artist.png' %>" alt="<%= artist.name %> Profile Picture" onerror="this.src='/images/default-artist.png'">
+  </div>
+  <div class="artist-details">
+    <h1><%= artist.name %></h1>
+    <p>Explore top tracks, music downloads, and YouTube conversions by <%= artist.name %>.</p>
+    <div class="artist-genres">
+      <% if (artist.genres && artist.genres.length > 0) { %>
+        <% artist.genres.forEach(genre => { %>
+          <span class="genre-tag"><%= genre %></span>
+        <% }) %>
+      <% } else { %>
+        <span class="genre-tag">Music Artist</span>
+      <% } %>
+      <span class="genre-tag" style="background: rgba(139, 92, 246, 0.1); border-color: var(--accent-primary);"><%= artist.views || 0 %> views</span>
+    </div>
+  </div>
+</section>
+
+<!-- Converted Songs List -->
+<section style="margin-bottom: 50px;">
+  <h2 class="section-title">Top Tracks by <%= artist.name %></h2>
+  
+  <% if (songs && songs.length > 0) { %>
+    <div class="music-grid">
+      <% songs.forEach(song => { %>
+        <div class="music-card">
+          <div class="card-img-wrap">
+            <img src="<%= song.thumbnail %>" alt="<%= song.title %> MP3" loading="lazy">
+          </div>
+          <div class="card-title" title="<%= song.title %>"><%= song.title %></div>
+          <div class="card-artist" title="<%= song.artist %>"><%= song.artist %></div>
+          <a href="/song/<%= song.slug %>" class="card-btn">Convert to MP3</a>
+        </div>
+      <% }) %>
+    </div>
+  <% } else { %>
+    <!-- True programmatic auto-linking helper -->
+    <div style="text-align: center; padding: 40px; border: 1px dashed var(--border-color); border-radius: var(--border-radius-md);">
+      <p style="color: var(--text-secondary);">We haven't indexed any songs for <%= artist.name %> yet. Click below to search and download their music from YouTube.</p>
+      <a href="/search/<%= artist.slug %>" class="btn-convert" style="display: inline-block; margin-top: 15px; padding: 10px 20px;">
+        Search for <%= artist.name %> Songs
+      </a>
+    </div>
+  <% } %>
+</section>
+
+<!-- Programmatic Artist SEO Content Block -->
+<% if (seoContent) { %>
+  <section class="seo-section">
+    <div class="seo-rich-block">
+      <h2>Download <%= artist.name %> MP3 Tracks Offline</h2>
+      <%- seoContent.replace(/\n\n/g, '</p><p>').replace(/^/, '<p>').replace(/$/, '</p>') %>
+    </div>
+  </section>
+<% } %>
+
+<%- include('partials/footer') %>

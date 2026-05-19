@@ -1,0 +1,162 @@
+<%- include('partials/header') %>
+
+<!-- Hero Header Section -->
+<section class="hero">
+  <h1>Convert YouTube to MP3 in <span>Highest Quality</span></h1>
+  <p>The fastest and most reliable online tool to download free MP3 music tracks from YouTube. No signups, no software installation, unlimited conversions.</p>
+  
+  <!-- Main Converter Card -->
+  <div class="converter-box">
+    <form id="converter-form" onsubmit="handleConvertSubmit(event)">
+      <div class="input-group">
+        <input type="text" id="video-input" placeholder="Paste YouTube link or enter song keywords (e.g. Faded Alan Walker)..." required>
+        <button type="submit" class="btn-convert" id="convert-btn">Convert to MP3</button>
+      </div>
+      
+      <div class="options-group">
+        <span class="options-label">Select Audio Quality:</span>
+        <div class="radio-tiles">
+          <label class="radio-tile-label">
+            <input type="radio" name="quality" value="320kbps" checked>
+            <div class="tile-content">320 kbps</div>
+          </label>
+          <label class="radio-tile-label">
+            <input type="radio" name="quality" value="128kbps">
+            <div class="tile-content">128 kbps</div>
+          </label>
+          <label class="radio-tile-label">
+            <input type="radio" name="quality" value="64kbps">
+            <div class="tile-content">64 kbps</div>
+          </label>
+        </div>
+      </div>
+    </form>
+
+    <!-- Progress / Download Action Card (Dynamically updated via JS) -->
+    <div class="status-container" id="status-card">
+      <div class="status-details">
+        <span class="status-phase" id="status-phase">Preparing...</span>
+        <span id="status-percent">0%</span>
+      </div>
+      <div class="progress-bar-outer">
+        <div class="progress-bar-inner" id="status-progress"></div>
+      </div>
+      <div id="status-download-btn-wrap" style="display: none;">
+        <a href="" id="status-download-link" class="btn-download-trigger" download>
+          Download MP3 File
+        </a>
+      </div>
+      <div id="status-error-wrap" class="badge badge-danger" style="display: none; padding: 10px; width: 100%; text-align: center; margin-top: 10px;">
+        Error occurred. Please check your link and try again.
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Recently Converted Tracks Grid -->
+<% if (internalLinks.recentSongs && internalLinks.recentSongs.length > 0) { %>
+  <section class="grid-section">
+    <h2 class="section-title">Recently Converted MP3s</h2>
+    <div class="music-grid">
+      <% internalLinks.recentSongs.slice(0, 6).forEach(song => { %>
+        <div class="music-card">
+          <div class="card-img-wrap">
+            <img src="<%= song.thumbnail %>" alt="<%= song.title %> MP3 Download" loading="lazy">
+          </div>
+          <div class="card-title" title="<%= song.title %>"><%= song.title %></div>
+          <div class="card-artist" title="<%= song.artist %>"><%= song.artist %></div>
+          <a href="/song/<%= song.slug %>" class="card-btn">Download MP3</a>
+        </div>
+      <% }) %>
+    </div>
+  </section>
+<% } %>
+
+<!-- Popular Artists Grid -->
+<% if (internalLinks.popularArtists && internalLinks.popularArtists.length > 0) { %>
+  <section class="grid-section">
+    <h2 class="section-title">Popular Artists</h2>
+    <div class="music-grid">
+      <% internalLinks.popularArtists.slice(0, 6).forEach(artist => { %>
+        <div class="music-card">
+          <div class="card-img-wrap" style="aspect-ratio: 1/1; border-radius: 50%;">
+            <img src="<%= artist.image %>" alt="<%= artist.name %> MP3 Music" loading="lazy">
+          </div>
+          <div class="card-title text-center" style="margin-top: 8px;"><%= artist.name %></div>
+          <a href="/artist/<%= artist.slug %>" class="card-btn" style="margin-top: 10px;">View Catalog</a>
+        </div>
+      <% }) %>
+    </div>
+  </section>
+<% } %>
+
+<!-- SEO Content Blocks -->
+<section class="seo-section">
+  <div class="seo-rich-block">
+    <h2>The Leading Free YouTube to MP3 Converter</h2>
+    <p>YTMP3 is the gold standard for online YouTube to MP3 audio conversions. Our advanced backend leverages high-throughput workers and state-of-the-art transcoding nodes to convert and save video streams in crystal-clear audio file formats. Best of all, it works without annoying page redirects or registration requirements.</p>
+
+    <h3>How to Convert and Download YouTube Videos to MP3:</h3>
+    <ol>
+      <li><strong>Copy the Link:</strong> Head over to YouTube and copy the URL of the video or track you want to download.</li>
+      <li><strong>Paste the Link:</strong> Insert the YouTube URL into the converter box above, or simply search for your favorite song name directly in the converter search input.</li>
+      <li><strong>Select Quality & Convert:</strong> Choose your desired audio quality. For high fidelity sound, we recommend <strong>320kbps</strong>. Click the "Convert" button.</li>
+      <li><strong>Download your File:</strong> Once the progress bar hits 100%, the green Download button will appear. Click it to save the converted MP3 file onto your mobile phone or PC.</li>
+    </ol>
+
+    <h3>Why Choose YTMP3?</h3>
+    <ul>
+      <li><strong>Unlimited Conversions:</strong> Free conversion for files of any length, with no caps or hidden subscription fees.</li>
+      <li><strong>High Bitrate Audios:</strong> Get studio-grade MP3 downloads with options going up to 320kbps.</li>
+      <li><strong>Safe & Secure:</strong> Our platform is designed defensively, serving direct downloads without bundleware installers or redirect loops.</li>
+      <li><strong>Mobile-First Platform:</strong> Clean layout responsive across Android, iPhone, iPad, Windows, and macOS browsers.</li>
+    </ul>
+  </div>
+</section>
+
+<!-- FAQs Section -->
+<section class="faq-section">
+  <div class="faq-wrapper">
+    <h2 class="section-title" style="margin-bottom: 30px;">Frequently Asked Questions</h2>
+    
+    <div class="faq-item">
+      <div class="faq-question">Is YTMP3 really free to use?</div>
+      <div class="faq-answer">
+        Yes, YTMP3 is 100% free. You can convert and download as many tracks as you want without paying any fees or creating an account.
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">What is the difference between 128kbps and 320kbps?</div>
+      <div class="faq-answer">
+        Kbps (kilobits per second) measures audio bitrate. 128kbps is standard web quality and results in smaller files. 320kbps is the highest MP3 quality, offering deeper bass, richer highs, and crystal-clear acoustic details similar to CD audio.
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">Do I need to sign up or install apps to download on mobile?</div>
+      <div class="faq-answer">
+        No, YTMP3 runs completely server-side in your web browser. You don't need to install any mobile apps, extensions, or configure profiles on Android or Safari.
+      </div>
+    </div>
+
+    <div class="faq-item">
+      <div class="faq-question">Can I convert videos longer than 30 minutes?</div>
+      <div class="faq-answer">
+        Yes! YTMP3 can handle long videos, DJ sets, podcasts, and soundscapes. However, longer files may take a bit more time to download and transcode, so please keep the tab open during the conversion.
+      </div>
+    </div>
+  </div>
+</section>
+
+<script>
+  // FAQ Accordion logic
+  document.querySelectorAll('.faq-question').forEach(item => {
+    item.addEventListener('click', event => {
+      const parent = item.parentElement;
+      parent.classList.toggle('active');
+    });
+  });
+</script>
+
+<%- include('partials/footer') %>

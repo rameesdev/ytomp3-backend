@@ -1,0 +1,42 @@
+<%- include('partials/header') %>
+
+<section class="hero" style="padding: 50px 0 30px; text-align: left;">
+  <h1 style="font-size: 38px;">Top <span><%= genre %></span> Music MP3 Conversions</h1>
+  <p>Browse and download the most converted <%= genre %> tracks. Get high-quality MP3 format files straight from YouTube streams for offline playback.</p>
+</section>
+
+<!-- Genre Grid -->
+<section style="margin-bottom: 50px;">
+  <h2 class="section-title">Popular <%= genre %> Tracks</h2>
+  
+  <% if (songs && songs.length > 0) { %>
+    <div class="music-grid">
+      <% songs.forEach(song => { %>
+        <div class="music-card">
+          <div class="card-img-wrap">
+            <img src="<%= song.thumbnail %>" alt="<%= song.title %> MP3" loading="lazy">
+          </div>
+          <div class="card-title" title="<%= song.title %>"><%= song.title %></div>
+          <div class="card-artist" title="<%= song.artist %>"><%= song.artist %></div>
+          <a href="/song/<%= song.slug %>" class="card-btn">Convert to MP3</a>
+        </div>
+      <% }) %>
+    </div>
+  <% } else { %>
+    <div style="text-align: center; padding: 40px; border: 1px dashed var(--border-color); border-radius: var(--border-radius-md);">
+      <p style="color: var(--text-secondary);">No songs have been converted under the <%= genre %> genre yet. Start by converting your favorite track from the homepage!</p>
+      <a href="/" class="btn-convert" style="display: inline-block; margin-top: 15px; padding: 10px 20px;">Go to Homepage</a>
+    </div>
+  <% } %>
+</section>
+
+<!-- Static SEO block for Genres -->
+<section class="seo-section">
+  <div class="seo-rich-block">
+    <h2>Convert and Download <%= genre %> Songs Online</h2>
+    <p>Love listening to <%= genre %> music? Whether you are into energetic tempos, smooth instrumentals, or vocal-heavy choruses, our online YouTube to MP3 converter makes it easy to take your favorite playlist offline. Simply search for any <%= genre %> artist or copy their YouTube track link into YTMP3. Enjoy high-speed encoding up to 320kbps and download the files directly to your phone or computer.</p>
+    <p>All download packages on YTMP3 are fully clean, registration-free, and safe. Discover popular releases and build your offline music database today.</p>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

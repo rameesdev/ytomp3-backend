@@ -1,0 +1,29 @@
+<%- include('../partials/header') %>
+
+<section class="hero" style="padding: 50px 0 30px; text-align: left;">
+  <h1 style="font-size: 38px;">Frequently <span>Asked Questions</span></h1>
+  <p>Got questions about using YTMP3 converter? Read below to find detailed answers on file formats, mobile compatibility, conversion speeds, and usage terms.</p>
+</section>
+
+<section style="margin-bottom: 60px;">
+  <div class="faq-wrapper" style="max-width: 100%;">
+    <% faqs.forEach(faq => { %>
+      <div class="faq-item">
+        <div class="faq-question"><%= faq.question %></div>
+        <div class="faq-answer"><%= faq.answer %></div>
+      </div>
+    <% }) %>
+  </div>
+</section>
+
+<script>
+  // FAQ Accordion logic
+  document.querySelectorAll('.faq-question').forEach(item => {
+    item.addEventListener('click', event => {
+      const parent = item.parentElement;
+      parent.classList.toggle('active');
+    });
+  });
+</script>
+
+<%- include('../partials/footer') %>
