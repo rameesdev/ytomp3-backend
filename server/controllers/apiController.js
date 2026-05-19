@@ -315,13 +315,14 @@ exports.serveDownload = async (req, res) => {
             return releaseLock();
           }
 
-          // Forward status code (e.g. 200 or 206)
-          res.statusCode = proxyRes.statusCode;
+          // Forward status code: If client requested a range, send 206. Otherwise, send 200.
+          res.statusCode = req.headers.range ? proxyRes.statusCode : 200;
 
-          // Forward range and content length headers if present
-          if (proxyRes.headers['content-range']) {
+          // Forward Content-Range header only if the client requested a range
+          if (req.headers.range && proxyRes.headers['content-range']) {
             res.setHeader('Content-Range', proxyRes.headers['content-range']);
           }
+          
           if (proxyRes.headers['content-length']) {
             res.setHeader('Content-Length', proxyRes.headers['content-length']);
           }
