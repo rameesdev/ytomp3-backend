@@ -17,8 +17,15 @@ function getCookiesArgs() {
         fs.mkdirSync(dir, { recursive: true });
       }
 
+      let cookiesContent = process.env.YT_COOKIES.trim();
+      if (cookiesContent.startsWith('"') && cookiesContent.endsWith('"')) {
+        cookiesContent = cookiesContent.slice(1, -1);
+      }
+      // Replace literal escaped \n with actual newlines
+      cookiesContent = cookiesContent.replace(/\\n/g, '\n');
+
       // Write Netscape cookies content to a file
-      fs.writeFileSync(cookiesPath, process.env.YT_COOKIES, 'utf8');
+      fs.writeFileSync(cookiesPath, cookiesContent, 'utf8');
       return `--cookies "${cookiesPath}"`;
     } catch (err) {
       console.error('Failed to write yt-dlp cookies file:', err.message);
