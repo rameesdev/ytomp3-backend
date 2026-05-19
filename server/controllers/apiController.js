@@ -107,12 +107,29 @@ exports.convert = async (req, res) => {
 
     let metadata;
     
+    // Check if the client passed metadata in the request body to avoid calling getVideoInfo
+    const clientTitle = req.body.title;
+    const clientArtist = req.body.artist;
+    const clientDuration = req.body.duration;
+    const clientThumbnail = req.body.thumbnail;
+
     if (!song) {
-      // Fetch metadata from YouTube
-      try {
-        metadata = await getVideoInfo(youtubeId);
-      } catch (err) {
-        return res.status(400).json({ error: 'Failed to fetch video details from YouTube.' });
+      if (clientTitle) {
+        metadata = {
+          youtubeId,
+          title: clientTitle,
+          artist: clientArtist || 'Unknown Artist',
+          duration: parseInt(clientDuration) || 0,
+          thumbnail: clientThumbnail || '',
+          slug: slugify(clientTitle, { lower: true, strict: true })
+        };
+      } else {
+        // Fetch metadata from YouTube as fallback
+        try {
+          metadata = await getVideoInfo(youtubeId);
+        } catch (err) {
+          return res.status(400).json({ error: 'Failed to fetch video details from YouTube.' });
+        }
       }
       
       const { title, artist, duration, thumbnail } = metadata;
