@@ -59,7 +59,7 @@ async function getVideoInfo(youtubeUrlOrId) {
     const ytDlpCmd = process.platform === 'win32' 
       ? `"${require('path').resolve(__dirname, '../../yt-dlp.exe')}"` 
       : `"${require('path').resolve(__dirname, '../../yt-dlp')}"`;
-    const command = `${ytDlpCmd} ${cookiesArg} --dump-json "${url}"`;
+    const command = `${ytDlpCmd} ${cookiesArg} --js-runtimes node --dump-json "${url}"`;
     
     const details = await new Promise((resolve, reject) => {
       exec(command, { maxBuffer: 1024 * 1024 * 5 }, (error, stdout) => {

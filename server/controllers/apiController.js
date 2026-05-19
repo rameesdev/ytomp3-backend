@@ -139,7 +139,7 @@ exports.convert = async (req, res) => {
       : `"${require('path').resolve(__dirname, '../../yt-dlp')}"`;
     
     // Request raw URL, --no-warnings ensures we only get the URL in stdout
-    const command = `${ytDlpCmd} --no-warnings ${cookiesArg} -f "bestaudio[ext=m4a]/bestaudio" --get-url "${videoUrl}"`;
+    const command = `${ytDlpCmd} --no-warnings ${cookiesArg} --js-runtimes node -f "bestaudio[ext=m4a]/bestaudio" --get-url "${videoUrl}"`;
 
     exec(command, (error, stdout, stderr) => {
       if (error) {
