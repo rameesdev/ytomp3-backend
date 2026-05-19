@@ -271,12 +271,12 @@ exports.serveDownload = async (req, res) => {
       res.on('finish', releaseLock);
       res.on('close', releaseLock);
 
-      // Serve the file as an M4A audio file
+      // Serve the file as an MP3 audio file by renaming the extension (zero-CPU)
       const safeName = `${song.title} - ${song.artist}`.replace(/[^\x20-\x7E]/g, '').trim() || 'Audio_Download';
-      const downloadName = `${safeName}.m4a`.replace(/[\/\\?%*:|"<>]/g, '');
+      const downloadName = `${safeName}.mp3`.replace(/[\/\\?%*:|"<>]/g, '');
 
-      res.setHeader('Content-Type', 'audio/mp4');
-      res.setHeader('Content-Disposition', `attachment; filename="YT_Audio.m4a"; filename*=UTF-8''${encodeURIComponent(downloadName)}`);
+      res.setHeader('Content-Type', 'audio/mpeg');
+      res.setHeader('Content-Disposition', `attachment; filename="YT_Audio.mp3"; filename*=UTF-8''${encodeURIComponent(downloadName)}`);
 
       const https = require('https');
 
