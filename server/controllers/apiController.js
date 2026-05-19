@@ -280,8 +280,15 @@ exports.serveDownload = async (req, res) => {
 
       const https = require('https');
 
-      // Helper function to stream a URL to the client
-      const startStreaming = (urlToStream) => {
+      // Helper function to stream a URL to the client, following redirects recursively
+      const startStreaming = (urlToStream, redirectDepth = 0) => {
+        if (redirectDepth > 5) {
+          console.error('Too many redirects from YouTube CDN');
+          if (!res.headersSent) res.status(500).send('Too many redirects from YouTube CDN.');
+          res.end();
+          return releaseLock();
+        }
+
         const rangeHeader = req.headers.range || 'bytes=0-';
         const options = {
           headers: {
@@ -291,6 +298,15 @@ exports.serveDownload = async (req, res) => {
         };
 
         https.get(urlToStream, options, (proxyRes) => {
+          // If the server returns a redirect (301, 302, 307, 308), follow it recursively
+          if ([301, 302, 307, 308].includes(proxyRes.statusCode)) {
+            const redirectUrl = proxyRes.headers.location;
+            if (redirectUrl) {
+              console.log(`[Redirect] Following ${proxyRes.statusCode} to: ${redirectUrl}`);
+              return startStreaming(redirectUrl, redirectDepth + 1);
+            }
+          }
+
           // If YouTube returns an error, abort
           if (proxyRes.statusCode !== 200 && proxyRes.statusCode !== 206) {
             console.error(`YouTube stream returned status code: ${proxyRes.statusCode}`);
