@@ -282,15 +282,30 @@ exports.serveDownload = async (req, res) => {
 
       // Helper function to stream a URL to the client
       const startStreaming = (urlToStream) => {
-        https.get(urlToStream, (proxyRes) => {
+        const rangeHeader = req.headers.range || 'bytes=0-';
+        const options = {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+            'Range': rangeHeader
+          }
+        };
+
+        https.get(urlToStream, options, (proxyRes) => {
           // If YouTube returns an error, abort
-          if (proxyRes.statusCode !== 200) {
+          if (proxyRes.statusCode !== 200 && proxyRes.statusCode !== 206) {
+            console.error(`YouTube stream returned status code: ${proxyRes.statusCode}`);
             if (!res.headersSent) res.status(500).send('Failed to stream audio from YouTube.');
             res.end();
             return releaseLock();
           }
 
-          // Pass along Content-Length if available so the browser shows a proper progress bar!
+          // Forward status code (e.g. 200 or 206)
+          res.statusCode = proxyRes.statusCode;
+
+          // Forward range and content length headers if present
+          if (proxyRes.headers['content-range']) {
+            res.setHeader('Content-Range', proxyRes.headers['content-range']);
+          }
           if (proxyRes.headers['content-length']) {
             res.setHeader('Content-Length', proxyRes.headers['content-length']);
           }
